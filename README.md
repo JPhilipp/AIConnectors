@@ -22,3 +22,7 @@ Alternatively, you can also connect to the paid [Replicate.com](https://replicat
 **GPT-3** is a deep learning artificial intelligence which continues a given text prompt. For instance, as you can try for yourself in the [OpenAI playground](https://beta.openai.com/playground), the text "Albert Einstein was" gets completed with "born in Ulm, in the Kingdom of Württemberg in the German Empire, on 14 March 1879. His parents were ..." and more.
 
 To see this in action, check out the [AI TV channel on YouTube](https://www.youtube.com/playlist?list=PL9LD6IUjh-8iQZ-cvfTYwnuzEDECCqrRr), including a Behind the Code video.
+
+---
+
+These classes read local key files, the path of which you can change via `ImageAI.key = "..."` and `TextAI.key = "..."` as shown in UniverseStart.cs. You also want to change the cache path near the top of GlobalUse/Cache.cs.
