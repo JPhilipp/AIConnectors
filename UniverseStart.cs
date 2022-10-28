@@ -105,7 +105,7 @@ namespace Universe
     {
         imageAI = GetComponent<ImageAI>();
 
-        string prompt = "xmas tree";
+        string prompt = "person on mountain";
         const string promptSuffix = ", minimalist 3d";
         prompt += promptSuffix;
         Debug.Log("Sending prompt " + prompt);

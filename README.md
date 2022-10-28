@@ -21,5 +21,54 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 
 * **Json:** Please grab [Newtonsoft Json](https://www.newtonsoft.com/json) to get these to work.
 * **Automatic111 StableDiffusion**: Follow the [install instructions on this repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui), including setting up Python on Windows. Then follow [these instructions to set up the API](https://sphuff.dev/automatic-now-has-an-api).
-* **Key paths:** These classes read local key files, the path of which you can change via `ImageAI.key = "..."` and `TextAI.key = "..."` as shown in UniverseStart.cs.
-* **Cache path:** You also want to change the cache path near the top of GlobalUse/Cache.cs.
+* **Key paths:** For GPT-3, put your OpenAI API key into a text file, the path of which you provide via `TextAI.key = "..."`. And if instead of a local StableDiffusion you want to use Replicate.com, add your API key with them into a file you then reference via `ImageAI.key = "..."`.
+* **Cache path:** Change the cache path via `Cache.rootFolder = "..."` to a directory of your choice.
+
+## How to use
+
+Have a look at UniverseStart.cs to see some examples for GPT-3 and Stable Diffusion live lookups in action.
+
+For instance, this is how to use **GPT-3** in Unity:
+
+    async void TestTextAI()
+    {
+        textAI = GetComponent<TextAI>();
+        string result = await textAI.GetCompletion("Albert Einstein was");
+        if (!string.IsNullOrEmpty(result))
+        {
+            Debug.Log(result);
+        }
+    }
+
+You can also await several prompts simultaneously:
+
+    async void TestWhenAll()
+    {
+        Task<string> a = textAI.GetCompletion("Albert Einstein was");
+        Task<string> b = textAI.GetCompletion("Susan Sarandon is");
+
+        await Task.WhenAll(a, b);
+        
+        Debug.Log("a: " + a.Result);
+        Debug.Log("b: " + b.Result);
+    }
+
+Text completion is further [described at OpenAI](https://beta.openai.com/docs/guides/completion).
+
+To grab a live Texture2D from **Stable Diffusion** for a Unity shape, use:
+
+    void TestImageAI()
+    {
+        imageAI = GetComponent<ImageAI>();
+        StartCoroutine(
+            imageAI.GetImage("person on mountain", (Texture2D texture) =>
+            {
+                Renderer renderer = GetComponent<Renderer>();
+                renderer.material.mainTexture = texture;
+            },
+            useCache: false, width: 512, height: 512
+        ));
+    }
+
+You can find Stable Diffusion prompt inspiration at [Lexica.art](https://lexica.art). 
+
