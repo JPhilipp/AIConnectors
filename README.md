@@ -13,7 +13,7 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 
 ---
 
-**GPT-3** is a deep learning artificial intelligence which continues a given text prompt. For instance, as you can try for yourself in the [OpenAI playground](https://beta.openai.com/playground), the text "Albert Einstein was" gets completed with "born in Ulm, in the Kingdom of Württemberg in the German Empire, on 14 March 1879. His parents were ..." and more.
+**GPT-3** is a deep learning artificial intelligence which continues a given text prompt. For instance, as you can try for yourself in the [OpenAI playground](https://beta.openai.com/playground), the text "Albert Einstein was" gets completed with "born in Ulm, in the Kingdom of Württemberg in the German Empire, on 14 March 1879. His parents were ..." and more. This project contains a class to connect to the OpenAI API.
 
 ---
 
@@ -53,7 +53,7 @@ You can also await several prompts simultaneously:
         Debug.Log("b: " + b.Result);
     }
 
-Text completion is further [described at OpenAI](https://beta.openai.com/docs/guides/completion).
+If you prefer, there's also a class available to use Coroutines instead of async-await. Text completion is further [described at OpenAI](https://beta.openai.com/docs/guides/completion).
 
 To grab a live Texture2D from **Stable Diffusion** for a Unity shape, use:
 
