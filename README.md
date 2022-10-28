@@ -20,6 +20,6 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 ## How to install
 
 * **Json:** Please grab [Newtonsoft Json](https://www.newtonsoft.com/json) to get these to work.
-* **Automatic111 StableDiffusion**: Follow the [install instructions on this repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui). Then follow [these instructions to set up the API](https://sphuff.dev/automatic-now-has-an-api).
+* **Automatic111 StableDiffusion**: Follow the [install instructions on this repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui), including setting up Python on Windows. Then follow [these instructions to set up the API](https://sphuff.dev/automatic-now-has-an-api).
 * **Key paths:** These classes read local key files, the path of which you can change via `ImageAI.key = "..."` and `TextAI.key = "..."` as shown in UniverseStart.cs.
 * **Cache path:** You also want to change the cache path near the top of GlobalUse/Cache.cs.
