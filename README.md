@@ -21,7 +21,7 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 
 * **Json:** Please grab [Newtonsoft Json](https://www.newtonsoft.com/json) to get these to work.
 * **Automatic111 StableDiffusion**: Follow the [install instructions on this repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui), including setting up Python on Windows. Then follow [these instructions to set up the API](https://sphuff.dev/automatic-now-has-an-api).
-* **Key paths:** For GPT-3, put your OpenAI API key into a text file, the path of which you provide via `TextAI.key = "..."`. And if instead of a local StableDiffusion you want to use Replicate.com, add your API key with them into a file you then reference via `ImageAI.key = "..."`.
+* **Key paths:** For GPT-3, put your OpenAI API key into a text file, the path of which you provide via `TextAI.key = "..."`. And if instead of a local StableDiffusion you want to use Replicate.com, add your API key with them into a file you then reference via `ImageAIReplicate.key = "..."`.
 * **Cache path:** Change the cache path via `Cache.rootFolder = "..."` to a directory of your choice.
 
 ## How to use

@@ -11,8 +11,6 @@ public class ImageAI : MonoBehaviour
     // http://localhost:7860/docs#/default/text2imgapi_sdapi_v1_txt2img_post
     // The alternative class ImageAIReplicate connects to the cloud and is paid.
 
-    public static string key = null;
-
     public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] initImage = null, byte[] mask = null, string cacheKey = null)
     {
         ImageToImageAIParams aiParams = new ImageToImageAIParams()

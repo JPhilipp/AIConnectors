@@ -26,7 +26,7 @@ namespace Universe
 
         Cache.rootFolder = pathPrefix + "Cache";
 
-        ImageAI.key = File.ReadAllText(pathPrefix + "replicate-key.txt");
+        ImageAIReplicate.key = File.ReadAllText(pathPrefix + "replicate-key.txt");
         TextAI.key  = File.ReadAllText(pathPrefix + "openai-key.txt");
         CoroutineVariant.TextAI.key = File.ReadAllText(pathPrefix + "openai-key.txt");
 
