@@ -13,7 +13,7 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 
 **Stable Diffusion** is a machine learning AI that turns text (or images) into images. For instance, "knight in shiny armor, fantasy art" becomes a glorious 1024x768 painting in seconds.
 
-You'll find a class to connect Unity to a local API, which you can install by following these instructions: https://sphuff.dev/automatic-now-has-an-api
+You'll find a class to connect Unity to a local API, which you can install by following [these instructions](https://sphuff.dev/automatic-now-has-an-api).
 
 Alternatively, you can also connect to the paid [Replicate.com](https://replicate.com) with your account there.
 
