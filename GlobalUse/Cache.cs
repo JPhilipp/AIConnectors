@@ -6,7 +6,7 @@ using System.IO;
 
 public class Cache
 {
-    public static string rootFolder = @"D:\AIWorldGenerator_Project\Cache";
+    public static string rootFolder = @"D:\_misc\Cache";
     string subFolder = "Miscellaneous";
     string extension = "dat";
 

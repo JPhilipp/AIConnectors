@@ -23,9 +23,12 @@ namespace Universe
     void Awake()
     {
         const string pathPrefix = @"D:\_misc\";
-        ImageAI.key = System.IO.File.ReadAllText(pathPrefix + "replicate-key.txt");
-        TextAI.key  = System.IO.File.ReadAllText(pathPrefix + "openai-key.txt");
-        CoroutineVariant.TextAI.key  = System.IO.File.ReadAllText(pathPrefix + "openai-key.txt");
+
+        Cache.rootFolder = pathPrefix + "Cache";
+
+        ImageAI.key = File.ReadAllText(pathPrefix + "replicate-key.txt");
+        TextAI.key  = File.ReadAllText(pathPrefix + "openai-key.txt");
+        CoroutineVariant.TextAI.key = File.ReadAllText(pathPrefix + "openai-key.txt");
 
         textAI = GetComponent<TextAI>();
     }
