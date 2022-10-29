@@ -53,7 +53,7 @@ You can also await several prompts simultaneously:
         Debug.Log("b: " + b.Result);
     }
 
-If you prefer, there's also a class available to use Coroutines instead of async-await. Text completion is further [described at OpenAI](https://beta.openai.com/docs/guides/completion).
+If you prefer, there's also a class available to use Coroutines instead of async-await. Text completion is further [described at OpenAI](https://beta.openai.com/docs/guides/completion). For example you can use GPT-3 to automatically generate room descriptions, things NPCs speak in chat, or [Unity C# tips](https://outer-court.com/csharp-tips/).
 
 To grab a live Texture2D from **Stable Diffusion** for a Unity shape, use:
 
