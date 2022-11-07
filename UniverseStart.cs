@@ -135,8 +135,9 @@ namespace Universe
                 Debug.Log("Done.");
                 Renderer renderer = testCube.GetComponent<Renderer>();
                 
-                Color transparentBlack = new Color(0f, 0f, 0f, 0f);
-                ImageFloodFill.FillFromCorners(texture, transparentBlack, threshold: 0.075f);
+                Color fillColor = new Color(0f, 0f, 0.2f, 0f);
+                ImageFloodFill.FillFromCorners(
+                    texture, fillColor, threshold: 0.075f, contour: 5f);
                 
                 renderer.material.mainTexture = texture;
             },
