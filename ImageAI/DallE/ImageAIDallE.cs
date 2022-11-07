@@ -21,10 +21,11 @@ public class ImageAIDallE : MonoBehaviour
         {
             prompt = prompt,
             width = width,
-            height = height,
+            height = height
 
-            image = ImageAIHelper.ImageBytesToDataString(image),
-            mask = ImageAIHelper.ImageBytesToDataString(mask)
+            // Image and Mask not yet supported.
+            // image = ImageAIHelper.ImageBytesToDataString(image),
+            // mask = ImageAIHelper.ImageBytesToDataString(mask)
         };
         return GetImage(callback, aiParams, useCache, cacheKey);
     }
