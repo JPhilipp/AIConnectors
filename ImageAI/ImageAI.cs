@@ -22,8 +22,8 @@ public class ImageAI : MonoBehaviour
             promptStrength = promptStrength,
             steps = steps,
 
-            initImages = initImage != null ? new string[] { ImageBytesToDataString(initImage) } : null,
-            mask = ImageBytesToDataString(mask)
+            initImages = initImage != null ? new string[] { ImageAIHelper.ImageBytesToDataString(initImage) } : null,
+            mask = ImageAIHelper.ImageBytesToDataString(mask)
         };
         return GetImage(callback, aiParams, useCache, cacheKey);
     }
@@ -45,7 +45,7 @@ public class ImageAI : MonoBehaviour
             cacheContent = cache.GetData(cacheKey);
             if (cacheContent != null)
             {
-                callback?.Invoke(GetTextureFromData(cacheContent));
+                callback?.Invoke(ImageAIHelper.GetTextureFromData(cacheContent));
             }
         }
 
@@ -64,7 +64,6 @@ public class ImageAI : MonoBehaviour
             };
 
             string jsonString = JsonConvert.SerializeObject(aiParams, Formatting.None, serializerSettings);
-            Debug.Log(jsonString);
 
             www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonString));
             www.downloadHandler = new DownloadHandlerBuffer();
@@ -78,7 +77,6 @@ public class ImageAI : MonoBehaviour
             else
             {
                 string result = www.downloadHandler.text;
-                // Debug.Log("ImageAI result: " + result);
 
                 var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
                 string base64Image = jsonData.SelectToken("images[0]").ToString();
@@ -87,7 +85,7 @@ public class ImageAI : MonoBehaviour
                     byte[] data = System.Convert.FromBase64String(base64Image);
                     www.Dispose();
                     if (useCache) { cache.SetData(cacheKey, data, createKeyFoldersIfNeeded: true); }
-                    callback?.Invoke(GetTextureFromData(data));
+                    callback?.Invoke(ImageAIHelper.GetTextureFromData(data));
                 }
                 else
                 {
@@ -97,18 +95,5 @@ public class ImageAI : MonoBehaviour
                 }
             }
         }
-    }
-
-    Texture2D GetTextureFromData(byte[] data)
-    {
-        Texture2D texture = new Texture2D(0, 0);
-        ImageConversion.LoadImage(texture, data);
-        return texture;
-    }
-
-    static string ImageBytesToDataString(byte[] bytes)
-    {
-        return bytes != null ?
-            "data:image/png;base64," + System.Convert.ToBase64String(bytes) : null;
     }
 }

@@ -26,8 +26,8 @@ public class ImageAIReplicate : MonoBehaviour
             steps = steps,
             promptStrength = promptStrength,
             seed = seed,
-            initImage = ImageBytesToDataString(initImage),
-            mask = ImageBytesToDataString(mask)
+            initImage = ImageAIHelper.ImageBytesToDataString(initImage),
+            mask = ImageAIHelper.ImageBytesToDataString(mask)
         };
         return GetImage(callback, aiParams, useCache, cacheKey);
     }
@@ -57,7 +57,7 @@ public class ImageAIReplicate : MonoBehaviour
         {
             if (string.IsNullOrEmpty(key))
             {
-                Debug.LogError("ImageAI Replicate.com key not set.");
+                Debug.LogError("ImageAIReplicate key not set.");
                 yield return null;
             }
             else if (callCount < callCountMaxForSecurity)
@@ -77,7 +77,6 @@ public class ImageAIReplicate : MonoBehaviour
 
                 var replicateParams = new ImageAIParamsWrapperReplicate {input = aiParams};
                 string jsonString = JsonConvert.SerializeObject(replicateParams, Formatting.None, serializerSettings);;
-                Debug.Log(jsonString);
 
                 www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonString));
                 www.downloadHandler = new DownloadHandlerBuffer();
@@ -91,7 +90,6 @@ public class ImageAIReplicate : MonoBehaviour
                 else
                 {
                     string result = www.downloadHandler.text;
-                    Debug.Log("StableDiffusionImageAI result: " + result);
 
                     var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
                     string progressUrl = jsonData.SelectToken("urls.get").ToString();
@@ -150,7 +148,6 @@ public class ImageAIReplicate : MonoBehaviour
             string completedAt = jsonData.SelectToken("completed_at")?.ToString();
             if (string.IsNullOrEmpty(completedAt))
             {
-                // Debug.Log("...");
                 www.Dispose();
                 yield return new WaitForSeconds(repeatDelay);
                 StartCoroutine(CheckCompletionProgress(url, callback));
@@ -191,11 +188,5 @@ public class ImageAIReplicate : MonoBehaviour
             www.Dispose();
             callback?.Invoke(data);
         }
-    }
-
-    static string ImageBytesToDataString(byte[] bytes)
-    {
-        return bytes != null ?
-            "data:image/png;base64," + System.Convert.ToBase64String(bytes) : null;
     }
 }

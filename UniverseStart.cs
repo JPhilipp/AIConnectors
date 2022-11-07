@@ -10,14 +10,11 @@ namespace Universe
 
 [DisallowMultipleComponent] public class UniverseStart : MonoBehaviour
 {
-    // The base class to launch everything, like the generation of the universe.
-    // Here we show how a cube is textured via StableDiffusion, and a text completed
-    // via GPT-3.
+    // Here we show how a cube is textured via StableDiffusion, and a
+    // text completed via GPT-3.
 
     [SerializeField] GameObject testCube = null;
-
-    UniverseGenerator universeGenerator = null;
-    ImageAI imageAI = null;
+    
     TextAI textAI = null;
 
     void Awake()
@@ -26,11 +23,14 @@ namespace Universe
 
         Cache.rootFolder = pathPrefix + "Cache";
 
-        ImageAIReplicate.key = File.ReadAllText(pathPrefix + "replicate-key.txt");
-        TextAI.key  = File.ReadAllText(pathPrefix + "openai-key.txt");
-        CoroutineVariant.TextAI.key = File.ReadAllText(pathPrefix + "openai-key.txt");
+        string openAIKey = File.ReadAllText(pathPrefix + "openai-key.txt");
+        TextAI.key  = openAIKey;
+        CoroutineVariant.TextAI.key = openAIKey;
+        ImageAIDallE.key = openAIKey;
 
-        textAI = GetComponent<TextAI>();
+        ImageAIReplicate.key = File.ReadAllText(pathPrefix + "replicate-key.txt");
+
+        textAI = Misc.GetAddComponent<TextAI>(gameObject);
     }
 
     async void Start()
@@ -103,11 +103,9 @@ namespace Universe
 
     void TestImageAI()
     {
-        imageAI = GetComponent<ImageAI>();
+        ImageAI imageAI = Misc.GetAddComponent<ImageAI>(gameObject);
 
-        string prompt = "person on mountain";
-        const string promptSuffix = ", minimalist 3d";
-        prompt += promptSuffix;
+        string prompt = "person on mountain, minimalist 3d";
         Debug.Log("Sending prompt " + prompt);
 
         StartCoroutine(
@@ -119,6 +117,27 @@ namespace Universe
             },
             useCache: false,
             width: 256, height: 256
+        ));
+    }
+
+    void TestImageAIDallE()
+    {
+        ImageAIDallE imageAI = Misc.GetAddComponent<ImageAIDallE>(gameObject);
+
+        string prompt = "person on mountain, minimalist 3d";
+        Debug.Log("Sending prompt " + prompt);
+
+        const int size = 1024;
+
+        StartCoroutine(
+            imageAI.GetImage(prompt, (Texture2D texture) =>
+            {
+                Debug.Log("Done.");
+                Renderer renderer = testCube.GetComponent<Renderer>();
+                renderer.material.mainTexture = texture;
+            },
+            useCache: true,
+            width: size, height: size
         ));
     }
 }
