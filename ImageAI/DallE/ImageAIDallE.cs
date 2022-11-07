@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
+using System.Text;
 
 public class ImageAIDallE : MonoBehaviour
 {
     // Converts text-to-image via the paid OpenAI Dall-E 2 API.
     // https://beta.openai.com/docs/guides/images/introduction
+    // https://beta.openai.com/docs/api-reference/images
     // Pricing: https://openai.com/api/pricing/
     // The alternative class ImageAI runs locally and is free.
 
@@ -15,17 +17,20 @@ public class ImageAIDallE : MonoBehaviour
     const int callCountMaxForSecurity = 10;
     static int callCount = 0;
 
+    const string modeGeneration = "generations";
+    const string modeEdit       = "edits";
+    const string modeVariation  = "variations";
+
     public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, byte[] image = null, byte[] mask = null, string cacheKey = null)
     {
         ImageAIParamsDallE aiParams = new ImageAIParamsDallE()
         {
             prompt = prompt,
             width = width,
-            height = height
+            height = height,
 
-            // Image and Mask not yet supported.
-            // image = ImageAIHelper.ImageBytesToDataString(image),
-            // mask = ImageAIHelper.ImageBytesToDataString(mask)
+            image = image,
+            mask = mask
         };
         return GetImage(callback, aiParams, useCache, cacheKey);
     }
@@ -67,52 +72,67 @@ public class ImageAIDallE : MonoBehaviour
             {
                 callCount++;
 
-                string apiMode = "generations";
-                if (aiParams.image != null)
+                string mode = modeGeneration;
+                if (aiParams.image != null) { mode = aiParams.mask != null ? modeEdit : modeVariation; }
+                string apiUrl = "https://api.openai.com/v1/images/" + mode;
+                string jsonString = null;
+                List<IMultipartFormSection> formParts = null;
+
+                if (mode == modeGeneration)
                 {
-                    apiMode = aiParams.mask != null ? "edits" : "variations";
-                }
-                string apiUrl = "https://api.openai.com/v1/images/" + apiMode;
-
-                UnityWebRequest www = UnityWebRequest.Post(apiUrl, "");
-                www.SetRequestHeader("Content-Type", "application/json");
-                www.SetRequestHeader("Authorization", "Bearer " + key);
-
-                var serializerSettings = new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    DefaultValueHandling = DefaultValueHandling.Ignore
-                };
-
-                string jsonString = JsonConvert.SerializeObject(aiParams, Formatting.None, serializerSettings);
-
-                www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonString));
-                www.downloadHandler = new DownloadHandlerBuffer();
-
-                yield return www.SendWebRequest();
-                if (www.result == UnityWebRequest.Result.ConnectionError)
-                {
-                    Debug.LogWarning(www.error);
-                    www.Dispose();
+                    var serializerSettings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        DefaultValueHandling = DefaultValueHandling.Ignore
+                    };
+                    jsonString = JsonConvert.SerializeObject(aiParams, Formatting.None, serializerSettings);
                 }
                 else
                 {
-                    string result = www.downloadHandler.text;
-
-                    var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
-                    string base64Image = jsonData.SelectToken("data[0]['" + aiParams.responseFormat + "']").ToString();
-                    if (!string.IsNullOrEmpty(base64Image))
+                    formParts = new List<IMultipartFormSection>();
+                    
+                    formParts.Add(new MultipartFormDataSection("response_format", aiParams.responseFormat));
+                    formParts.Add(new MultipartFormDataSection("size", aiParams.size));
+                    formParts.Add(new MultipartFormFileSection("image", aiParams.image, "image.png", "image/png"));
+                    if (mode == modeEdit)
                     {
-                        byte[] data = System.Convert.FromBase64String(base64Image);
-                        www.Dispose();
-                        if (useCache) { cache.SetData(cacheKey, data, createKeyFoldersIfNeeded: true); }
-                        callback?.Invoke(ImageAIHelper.GetTextureFromData(data));
+                        formParts.Add(new MultipartFormDataSection("prompt", aiParams.prompt));
+                        formParts.Add(new MultipartFormFileSection("mask", aiParams.mask, "mask.png", "image/png"));
+                    }
+                }
+ 
+                using (UnityWebRequest www = mode == modeGeneration ?
+                    UnityWebRequest.Post(apiUrl, "") : UnityWebRequest.Post(apiUrl, formParts))
+                {
+                    www.SetRequestHeader("Authorization", "Bearer " + key);
+                    if (mode == modeGeneration)
+                    {
+                        www.SetRequestHeader("Content-Type", "application/json");
+                        www.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonString));
+                    }
+
+                    yield return www.SendWebRequest();
+                    if (www.result == UnityWebRequest.Result.ConnectionError)
+                    {
+                        Debug.LogWarning(www.error);
                     }
                     else
                     {
-                        www.Dispose();
-                        Debug.LogWarning("Couldn't find image in ImageAIDallE Json");
-                        yield return null;
+                        string result = www.downloadHandler.text;
+
+                        var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
+                        string base64Image = jsonData.SelectToken("data[0]['" + aiParams.responseFormat + "']").ToString();
+                        if (!string.IsNullOrEmpty(base64Image))
+                        {
+                            byte[] data = System.Convert.FromBase64String(base64Image);
+                            if (useCache) { cache.SetData(cacheKey, data, createKeyFoldersIfNeeded: true); }
+                            callback?.Invoke(ImageAIHelper.GetTextureFromData(data));
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Couldn't find image in ImageAIDallE Json");
+                            yield return null;
+                        }
                     }
                 }
             }
