@@ -124,7 +124,7 @@ namespace Universe
     {
         ImageAIDallE imageAI = Misc.GetAddComponent<ImageAIDallE>(gameObject);
 
-        string prompt = "person on mountain, minimalist 3d";
+        string prompt = "wizard's hut, black background, artstation asset";
         Debug.Log("Sending prompt " + prompt);
 
         const int size = 1024;
@@ -134,6 +134,10 @@ namespace Universe
             {
                 Debug.Log("Done.");
                 Renderer renderer = testCube.GetComponent<Renderer>();
+                
+                Color transparentBlack = new Color(0f, 0f, 0f, 0f);
+                ImageFloodFill.FillFromCorners(texture, transparentBlack, threshold: 0.075f);
+                
                 renderer.material.mainTexture = texture;
             },
             useCache: true,
