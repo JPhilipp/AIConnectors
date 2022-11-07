@@ -72,3 +72,6 @@ To grab a live Texture2D from **Stable Diffusion** for a Unity shape, use:
 
 You can find Stable Diffusion prompt inspiration at [Lexica.art](https://lexica.art). 
 
+To grab an image from **Dall-E 2**, use the same as above but change to
+
+        imageAI = GetComponent<ImageAIDallE>();
