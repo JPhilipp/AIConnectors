@@ -75,3 +75,8 @@ You can find Stable Diffusion prompt inspiration at [Lexica.art](https://lexica.
 To grab an image from **Dall-E 2**, use the same as above but change to
 
         imageAI = GetComponent<ImageAIDallE>();
+
+When prompting Dall-E or other APIs for something "... on black background", the following can be used to try remove that background by making it transparent (on objects where the shader is set to fade):
+
+    Color transparentBlack = new Color(0f, 0f, 0f, 0f);
+    ImageFloodFill.FillFromCorners(texture, transparentBlack, threshold: 0.075f);
