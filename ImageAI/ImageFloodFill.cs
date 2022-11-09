@@ -5,34 +5,51 @@ public static class ImageFloodFill
 {
     // Successively fills an image based on one or multiple start points,
     // with optional support for a color-difference-allowed threshold.
-    // Filling from corners with a transparent black can also be useful
+    // Filling from the sides with a transparent black can also be useful
     // for removing the background of a center-object, AI-generated image.
+    // The result can then optionally be bottom-aligned.
 
-    public static void FillFromPoint(Texture2D texture, Color color, Vector2Int point, float threshold = 0f, float contour = 0f)
+    public static void FillFromPoint(Texture2D texture, Color color, Vector2Int point, float threshold = 0f, float contour = 0f, bool removeLeftoverDither = false, bool bottomAlignImage = false)
     {
         var points = new Vector2Int[] { point };
-        FillFromPoints(texture, color, points, threshold, contour);
+        FillFromPoints(texture, color, points, threshold, contour, removeLeftoverDither, bottomAlignImage);
     }
 
-    public static void FillFromCorners(Texture2D texture, Color color, float threshold = 0f, float contour = 0f)
+    public static void FillFromSides(Texture2D texture, Color color, float threshold = 0f, float contour = 0f, bool removeLeftoverDither = false, bool bottomAlignImage = false)
     {
         var points = new Vector2Int[]
         {
             new Vector2Int(0,                 0),
             new Vector2Int(texture.width - 1, 0),
             new Vector2Int(0,                 texture.height - 1),
-            new Vector2Int(texture.width - 1, texture.height - 1)
+            new Vector2Int(texture.width - 1, texture.height - 1),
+
+            new Vector2Int(0,                 texture.height / 2),
+            new Vector2Int(texture.width - 1, texture.height / 2),
+
+            new Vector2Int(texture.width / 2, 0),
+            new Vector2Int(texture.width / 2, texture.height - 1),
         };
-        FillFromPoints(texture, color, points, threshold, contour);
+        FillFromPoints(texture, color, points, threshold, contour, removeLeftoverDither, bottomAlignImage);
     }
 
-    public static void FillFromPoints(Texture2D texture, Color color, Vector2Int[] points, float threshold = 0f, float contour = 0f)
+    public static void FillFromPoints(Texture2D texture, Color color, Vector2Int[] points, float threshold = 0f, float contour = 0f, bool removeLeftoverDither = false, bool bottomAlignImage = false)
     {
         Color[,] pixelsGrid = GetPixelsGrid(texture);
        
         foreach (Vector2Int point in points)
         {
             FillPixels(pixelsGrid, point, color, threshold);
+        }
+
+        if (removeLeftoverDither)
+        {
+            RemoveLeftoverDither(pixelsGrid, color);
+        }
+
+        if (bottomAlignImage)
+        {
+            BottomAlignImage(pixelsGrid, color);
         }
 
         if (contour > 0f)
@@ -46,7 +63,7 @@ public static class ImageFloodFill
 
     static void FillPixels(Color[,] pixels, Vector2Int startPoint, Color color, float threshold)
     {
-        int width = pixels.GetLength(0);
+        int width  = pixels.GetLength(0);
         int height = pixels.GetLength(1);
         var size = new RectInt(0, 0, width, height);
         bool[,] pixelsHandled = new bool[width, height];
@@ -69,6 +86,108 @@ public static class ImageFloodFill
                     stack.Push(new Vector2Int(point.x + 1, point.y));
                     stack.Push(new Vector2Int(point.x, point.y - 1));
                     stack.Push(new Vector2Int(point.x, point.y + 1));
+                }
+            }
+        }
+    }
+
+    static void BottomAlignImage(Color[,] pixels, Color fillColor)
+    {
+        int width  = pixels.GetLength(0);
+        int height = pixels.GetLength(1);
+        var rect = new RectInt(0, 0, width, height);
+
+        int bottomY = GetBottomRow(pixels, fillColor);
+        if (bottomY != -1)
+        {
+            int moveDownAmount = height - bottomY;
+            for (int y = height - 1; y >= moveDownAmount; y--)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    pixels[x, y] = pixels[x, y - moveDownAmount];
+                }
+            }
+            for (int y = 0; y < moveDownAmount; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    pixels[x, y] = fillColor;
+                }
+            }
+        }
+    }
+
+    static int GetBottomRow(Color[,] pixels, Color fillColor)
+    {
+        int width  = pixels.GetLength(0);
+        int height = pixels.GetLength(1);
+
+        for (int y = height - 1; y >= 0; y--)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                if (pixels[x, y] != fillColor)
+                {
+                    return y;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    static void RemoveLeftoverDither(Color[,] pixels, Color fillColor)
+    {
+        const int blockSize = 3;
+        int width  = pixels.GetLength(0);
+        int height = pixels.GetLength(1);
+        const int blockPixelAmountUponWhichToClear = 2;
+        
+        for (int x = 0; x < width; x += blockSize)
+        {
+            for (int y = 0; y < height; y += blockSize)
+            {
+                var rect = new RectInt(x, y, blockSize, blockSize);
+                int amount = GetFrontPixelsAmount(pixels, rect);
+                if (amount >= 1 && amount <= blockPixelAmountUponWhichToClear)
+                {
+                    ClearPixels(pixels, rect, fillColor);
+                }
+            }
+        }
+    }
+
+    static int GetFrontPixelsAmount(Color[,] pixels, RectInt rect)
+    {
+        int amount = 0;
+        RectInt size = new RectInt(0, 0, pixels.GetLength(0), pixels.GetLength(1));
+
+        for (int x = rect.xMin; x < rect.xMax; x++)
+        {
+            for (int y = rect.yMin; y < rect.yMax; y++)
+            {
+                if (size.Contains(new Vector2Int(x, y)) && pixels[x, y].a > 0f)
+                {
+                    amount++;
+                }
+            }
+        }
+
+        return amount;
+    }
+
+    static void ClearPixels(Color[,] pixels, RectInt rect, Color fillColor)
+    {
+        RectInt size = new RectInt(0, 0, pixels.GetLength(0), pixels.GetLength(1));
+
+        for (int x = rect.xMin; x < rect.xMax; x++)
+        {
+            for (int y = rect.yMin; y < rect.yMax; y++)
+            {
+                if (size.Contains(new Vector2Int(x, y)))
+                {
+                    pixels[x, y] = fillColor;
                 }
             }
         }
@@ -185,7 +304,7 @@ public static class ImageFloodFill
         {
             for (int y = 0; y < height; y++)
             {
-                pixels[x, y] = pixelsLinear[y * height + x];
+                pixels[x, height - y - 1] = pixelsLinear[y * height + x];
             }
         }
 
@@ -202,7 +321,7 @@ public static class ImageFloodFill
         {
             for (int y = 0; y < height; y++)
             {
-                pixelsLinear[y * height + x] = pixelsGrid[x, y];
+                pixelsLinear[y * height + x] = pixelsGrid[x, height - y - 1];
             }
         }
 
