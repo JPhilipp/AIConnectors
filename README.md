@@ -79,4 +79,5 @@ To grab an image from **Dall-E 2**, use the same as above but change to
 When prompting Dall-E or other APIs for something "... on black background", the following can be used to try remove that background by making it transparent (on objects where the shader is set to fade):
 
     Color fillColor = new Color(0f, 0f, 0.2f, 0f);
-    ImageFloodFill.FillFromCorners(texture, fillColor, threshold: 0.075f, contour: 5f);
+    ImageFloodFill.FillFromCorners(texture, fillColor,
+        threshold: 0.075f, contour: 5f, bottomAlignImage: true);
