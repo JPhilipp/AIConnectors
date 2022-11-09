@@ -121,6 +121,7 @@ public class ImageAIDallE : MonoBehaviour
                         string result = www.downloadHandler.text;
 
                         var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
+                        
                         var jsonToken = jsonData.SelectToken("data[0]['" + aiParams.responseFormat + "']");
                         string base64Image = jsonToken != null ? jsonToken.ToString() : null;
                         if (!string.IsNullOrEmpty(base64Image))
@@ -131,7 +132,10 @@ public class ImageAIDallE : MonoBehaviour
                         }
                         else
                         {
-                            Debug.LogWarning("Couldn't find image in ImageAIDallE Json\r\n" + result);
+                            var jsonErrorToken = jsonData.SelectToken("['error']['message']");
+                            string errorMessage = jsonErrorToken != null ? jsonErrorToken.ToString() : null;
+                            Debug.LogWarning("Couldn't find image in ImageAIDallE Json: " + errorMessage +
+                                "\r\n" + result);
                             yield return null;
                         }
                     }
