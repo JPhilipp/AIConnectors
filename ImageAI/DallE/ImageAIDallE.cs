@@ -14,7 +14,7 @@ public class ImageAIDallE : MonoBehaviour
     // The alternative class ImageAI runs locally and is free.
 
     public static string key = null;
-    const int callCountMaxForSecurity = 10;
+    const int callCountMaxForSecurity = 25;
     static int callCount = 0;
 
     const string modeGeneration = "generations";
@@ -121,7 +121,8 @@ public class ImageAIDallE : MonoBehaviour
                         string result = www.downloadHandler.text;
 
                         var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
-                        string base64Image = jsonData.SelectToken("data[0]['" + aiParams.responseFormat + "']").ToString();
+                        var jsonToken = jsonData.SelectToken("data[0]['" + aiParams.responseFormat + "']");
+                        string base64Image = jsonToken != null ? jsonToken.ToString() : null;
                         if (!string.IsNullOrEmpty(base64Image))
                         {
                             byte[] data = System.Convert.FromBase64String(base64Image);
@@ -130,7 +131,7 @@ public class ImageAIDallE : MonoBehaviour
                         }
                         else
                         {
-                            Debug.LogWarning("Couldn't find image in ImageAIDallE Json");
+                            Debug.LogWarning("Couldn't find image in ImageAIDallE Json\r\n" + result);
                             yield return null;
                         }
                     }
