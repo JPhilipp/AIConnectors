@@ -46,6 +46,11 @@ public class ImageAIReplicate : MonoBehaviour
             }
 
             cacheKey = Cache.ToKey(cacheKey);
+            while (cache.IsReserved(cacheKey))
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
             cacheContent = cache.GetData(cacheKey);
             if (cacheContent != null)
             {
@@ -62,6 +67,7 @@ public class ImageAIReplicate : MonoBehaviour
             }
             else if (callCount < callCountMaxForSecurity)
             {
+                cache.Reserve(cacheKey);
                 callCount++;
 
                 const string apiUrl = "https://api.replicate.com/v1/predictions";
@@ -86,6 +92,8 @@ public class ImageAIReplicate : MonoBehaviour
                 {
                     Debug.LogWarning(www.error);
                     www.Dispose();
+                    cache.ReleaseReservation(cacheKey);
+                    yield return null;
                 }
                 else
                 {
@@ -103,6 +111,7 @@ public class ImageAIReplicate : MonoBehaviour
                             {
                                 if (useCache) { cache.SetData(cacheKey, data); }
                                 callback?.Invoke(GetTextureFromData(data));
+                                cache.ReleaseReservation(cacheKey);
                             }
                         ));
                     }
@@ -110,13 +119,15 @@ public class ImageAIReplicate : MonoBehaviour
                     {
                         www.Dispose();
                         Debug.LogWarning("Couldn't find urls.get in ImageAI Json");
+                        cache.ReleaseReservation(cacheKey);
                         yield return null;
                     }
                 }
             }
             else
             {
-                Debug.LogWarning("ImageAI Call count limit reached.");
+                Debug.LogWarning("ImageAIReplicate Call count limit reached.");
+                cache.ReleaseReservation(cacheKey);
                 yield return null;
             }
         }

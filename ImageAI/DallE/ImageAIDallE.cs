@@ -48,6 +48,11 @@ public class ImageAIDallE : MonoBehaviour
             }
 
             cacheKey = Cache.ToKey(cacheKey, allowSlash: true);
+            while (cache.IsReserved(cacheKey))
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
             cacheContent = cache.GetData(cacheKey);
             if (cacheContent != null)
             {
@@ -70,7 +75,9 @@ public class ImageAIDallE : MonoBehaviour
             }
             else if (callCount < callCountMaxForSecurity)
             {
+                cache.Reserve(cacheKey);
                 callCount++;
+                Debug.Log("callCount = " + callCount);
 
                 string mode = modeGeneration;
                 if (aiParams.image != null) { mode = aiParams.mask != null ? modeEdit : modeVariation; }
@@ -136,9 +143,10 @@ public class ImageAIDallE : MonoBehaviour
                             string errorMessage = jsonErrorToken != null ? jsonErrorToken.ToString() : null;
                             Debug.LogWarning("Couldn't find image in ImageAIDallE Json: " + errorMessage +
                                 "\r\n" + result);
-                            yield return null;
                         }
                     }
+                    cache.ReleaseReservation(cacheKey);
+                    yield return null;
                 }
             }
             else
