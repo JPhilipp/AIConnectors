@@ -10,10 +10,34 @@ public class Cache
     string subFolder = "Miscellaneous";
     string extension = "dat";
 
+    static List<string> reservedKeys = new List<string>();
+
     public Cache(string subFolder = null, string extension = null)
     {
         if (subFolder != null)  { this.subFolder = subFolder; }
         if (extension != null)  { this.extension = ToValidExtension(extension); }
+    }
+
+    public void Reserve(string key)
+    {
+        if (!reservedKeys.Contains(key))
+        {
+            reservedKeys.Add(key);
+        }
+        else
+        {
+            Debug.LogWarning("Cache key already reserved: " + key);
+        }
+    }
+
+    public bool IsReserved(string key)
+    {
+        return reservedKeys.Contains(key);
+    }
+
+    public void ReleaseReservation(string key)
+    {
+        reservedKeys.Remove(key);
     }
 
     public string GetText(string key)
@@ -72,13 +96,15 @@ public class Cache
         }
     }
 
-    string GetPathByKey(string key)
+    public string GetPathByKey(string key)
     {
         return rootFolder + "\\" + subFolder + "\\" + key + "." + extension;
     }
 
     public static string ToKey(string s, bool allowSlash = false)
     {
+        // s = s.ToLower();
+
         s = s.Replace(" ", "_");
 
         s = s.Replace("\r\n", "_");

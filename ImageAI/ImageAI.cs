@@ -11,7 +11,7 @@ public class ImageAI : MonoBehaviour
     // http://localhost:7860/docs#/default/text2imgapi_sdapi_v1_txt2img_post
     // The alternative class ImageAIReplicate connects to the cloud and is paid.
 
-    public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] initImage = null, byte[] mask = null, string cacheKey = null)
+    public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] initImage = null, byte[] mask = null, string cacheKey = null, bool tiling = false)
     {
         ImageToImageAIParams aiParams = new ImageToImageAIParams()
         {
@@ -21,6 +21,7 @@ public class ImageAI : MonoBehaviour
             seed = seed,
             promptStrength = promptStrength,
             steps = steps,
+            tiling = tiling,
 
             initImages = initImage != null ? new string[] { ImageAIHelper.ImageBytesToDataString(initImage) } : null,
             mask = ImageAIHelper.ImageBytesToDataString(mask)
@@ -42,6 +43,11 @@ public class ImageAI : MonoBehaviour
             }
 
             cacheKey = Cache.ToKey(cacheKey, allowSlash: true);
+            while (cache.IsReserved(cacheKey))
+            {
+                yield return new WaitForSeconds(0.1f);
+            }
+
             cacheContent = cache.GetData(cacheKey);
             if (cacheContent != null)
             {
@@ -51,6 +57,8 @@ public class ImageAI : MonoBehaviour
 
         if (cacheContent == null)
         {
+            cache.Reserve(cacheKey);
+
             string apiMode = aiParams.initImages != null ? "img2img" : "txt2img";
             string apiUrl = "http://localhost:7860/sdapi/v1/" + apiMode;
 
@@ -73,6 +81,7 @@ public class ImageAI : MonoBehaviour
             {
                 Debug.LogWarning(www.error);
                 www.Dispose();
+                yield return null;
             }
             else
             {
@@ -91,8 +100,9 @@ public class ImageAI : MonoBehaviour
                 {
                     www.Dispose();
                     Debug.LogWarning("Couldn't find image in ImageAI Json");
-                    yield return null;
                 }
+                cache.ReleaseReservation(cacheKey);
+                yield return null;
             }
         }
     }
