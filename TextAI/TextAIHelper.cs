@@ -57,7 +57,11 @@ public static class TextAIHelper
                 }
                 catch (System.Exception exception)
                 {
-                    if (showWarnings) { Debug.LogWarning("Not JSON: " + jsonResult); }
+                    if (showWarnings)
+                    {
+                        Debug.LogWarning("Not JSON: " + jsonResult);
+                        Debug.LogWarning(exception);
+                    }
                 }
                 if (items.Count >= max) { break; }
             }

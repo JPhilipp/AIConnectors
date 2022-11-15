@@ -61,8 +61,6 @@ public class ImageAIParams
     [JsonProperty("cfg_scale")]
     public int promptStrength = 7;
 
-    string[] styles = null;
-
     [JsonProperty("restore_faces")]
     public bool restoreFaces = false;
 

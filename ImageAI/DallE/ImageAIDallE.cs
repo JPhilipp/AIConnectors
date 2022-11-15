@@ -21,6 +21,9 @@ public class ImageAIDallE : MonoBehaviour
     const string modeEdit       = "edits";
     const string modeVariation  = "variations";
 
+    [Header("Info")]
+    [SerializeField] string resultingCachePath = "";
+
     public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, byte[] image = null, byte[] mask = null, string cacheKey = null)
     {
         ImageAIParamsDallE aiParams = new ImageAIParamsDallE()
@@ -48,6 +51,8 @@ public class ImageAIDallE : MonoBehaviour
             }
 
             cacheKey = Cache.ToKey(cacheKey, allowSlash: true);
+            resultingCachePath = cache.GetPathByKey(cacheKey);
+
             while (cache.IsReserved(cacheKey))
             {
                 yield return new WaitForSeconds(0.1f);

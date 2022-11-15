@@ -272,31 +272,7 @@ public static class Misc
     {
         return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
     }
-
-    public static void DeepApplyLayer(Transform thisTransform, Layers layer)
-    {
-        DeepApplyLayer(thisTransform.gameObject, (int) layer);
-    }
-
-    public static void DeepApplyLayer(GameObject gameObject, Layers layer)
-    {
-        DeepApplyLayer(gameObject, (int) layer);
-    }
-
-    public static void DeepApplyLayer(Transform thisTransform, int layer)
-    {
-        DeepApplyLayer(thisTransform.gameObject, layer);
-    }
     
-    public static void DeepApplyLayer(GameObject thisObject, int layer)
-    {
-        Component[] transforms = thisObject.GetComponentsInChildren( typeof(Transform), true );
-        foreach (Transform thisTransform in transforms)
-        {
-            thisTransform.gameObject.layer = layer;
-        }
-    }
-
     public static float Fuzzy(float max)
     {
         return UnityEngine.Random.Range(-max, max);
@@ -453,7 +429,7 @@ public static class Misc
         foreach (Component component in components)
         {
             MonoBehaviour mb = component as MonoBehaviour;
-            if (mb != null && !(mb is Transform) && (mb is MonoBehaviour) && !(mb is System.Object))
+            if (mb != null && (mb is MonoBehaviour) && !(mb is System.Object))
             {
                 ((MonoBehaviour)mb).StopAllCoroutines();
                 Component.Destroy(mb);

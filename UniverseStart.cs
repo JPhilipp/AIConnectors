@@ -5,6 +5,7 @@ using System;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 namespace Universe
 {
 
@@ -33,7 +34,7 @@ namespace Universe
         textAI = Misc.GetAddComponent<TextAI>(gameObject);
     }
 
-    async void Start()
+    void Start()
     {
         // TestTextAI();
         // TestImageAI();

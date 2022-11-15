@@ -43,12 +43,14 @@ public class ImageAIParamsDallE
     // "Must be a valid PNG file, less than 4MB, and square."
     // When no mask is used, this is the image to use as the basis for the variations.
     // When mask is used too, this is the image to edit.
-    public string image = null;
+    
+    public byte[] image = null;
 
     // "An additional image whose fully transparent areas (e.g. where alpha is zero) indicate
     // where image should be edited. Must be a valid PNG file, less than 4MB, and have the
     // same dimensions as image."
-    public string mask = null;
+    [JsonIgnore]
+    public byte[] mask = null;
 
 
     public bool IsValidSize()
