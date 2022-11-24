@@ -14,6 +14,8 @@ public class ImageAI : MonoBehaviour
     [Header("Info")]
     [SerializeField] string resultingCachePath = "";
 
+    public const string cacheFolder = "ImageAI";
+
     public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] image = null, byte[] mask = null, string cacheKey = null, bool tiling = false, float denoisingStrength = 0.75f)
     {
         ImageToImageAIParams aiParams = new ImageToImageAIParams()
@@ -35,7 +37,7 @@ public class ImageAI : MonoBehaviour
 
     public IEnumerator GetImage(System.Action<Texture2D> callback, ImageToImageAIParams aiParams, bool useCache = false, string cacheKey = null)
     {
-        Cache cache = new Cache("ImageAI", "png");
+        Cache cache = new Cache(cacheFolder, "png");
 
         byte[] cacheContent = null;
         if (useCache)

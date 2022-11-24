@@ -304,7 +304,7 @@ public static class ImageFloodFill
         {
             for (int y = 0; y < height; y++)
             {
-                pixels[x, height - y - 1] = pixelsLinear[y * height + x];
+                pixels[x, height - y - 1] = pixelsLinear[y * width + x];
             }
         }
 
@@ -321,7 +321,7 @@ public static class ImageFloodFill
         {
             for (int y = 0; y < height; y++)
             {
-                pixelsLinear[y * height + x] = pixelsGrid[x, height - y - 1];
+                pixelsLinear[y * width + x] = pixelsGrid[x, height - y - 1];
             }
         }
 
