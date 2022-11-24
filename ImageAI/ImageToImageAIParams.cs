@@ -18,6 +18,13 @@ public class ImageToImageAIParams : ImageAIParams
     // The mask used for img2img. Black pixels allow painting over,
     // white pixels remain.
     public string mask = null;
+
+    // "Determines how little respect the algorithm should have for image's content. At 0,
+    // nothing will change, and at 1 you'll get an unrelated image. With values below 1.0,
+    // processing will take less steps than the Sampling Steps slider specifies."
+    // UI default: 0.75f
+    [JsonProperty("denoising_strength")]
+    public float denoisingStrength = 0;
     
     [JsonProperty("mask_blur")]
     public int maskBlur = 4;

@@ -18,9 +18,6 @@ public class ImageAIParams
     [JsonProperty("enable_hr")]
     public bool enableHighRes = false;
 
-    [JsonProperty("denoising_strength")]
-    public int denoisingStrength = 0;
-
     [JsonProperty("firstphase_width")]
     public int firstPhaseWidth = 0;
 
@@ -60,6 +57,8 @@ public class ImageAIParams
 
     [JsonProperty("cfg_scale")]
     public int promptStrength = 7;
+
+    // string[] styles = null;
 
     [JsonProperty("restore_faces")]
     public bool restoreFaces = false;

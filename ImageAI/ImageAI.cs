@@ -11,7 +11,10 @@ public class ImageAI : MonoBehaviour
     // http://localhost:7860/docs#/default/text2imgapi_sdapi_v1_txt2img_post
     // The alternative class ImageAIReplicate connects to the cloud and is paid.
 
-    public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] initImage = null, byte[] mask = null, string cacheKey = null, bool tiling = false)
+    [Header("Info")]
+    [SerializeField] string resultingCachePath = "";
+
+    public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] image = null, byte[] mask = null, string cacheKey = null, bool tiling = false, float denoisingStrength = 0.75f)
     {
         ImageToImageAIParams aiParams = new ImageToImageAIParams()
         {
@@ -23,8 +26,9 @@ public class ImageAI : MonoBehaviour
             steps = steps,
             tiling = tiling,
 
-            initImages = initImage != null ? new string[] { ImageAIHelper.ImageBytesToDataString(initImage) } : null,
-            mask = ImageAIHelper.ImageBytesToDataString(mask)
+            initImages = image != null ? new string[] { ImageAIHelper.ImageBytesToDataString(image) } : null,
+            mask = ImageAIHelper.ImageBytesToDataString(mask),
+            denoisingStrength = image != null ? denoisingStrength : 0f
         };
         return GetImage(callback, aiParams, useCache, cacheKey);
     }
@@ -43,6 +47,8 @@ public class ImageAI : MonoBehaviour
             }
 
             cacheKey = Cache.ToKey(cacheKey, allowSlash: true);
+            resultingCachePath = cache.GetPathByKey(cacheKey);
+
             while (cache.IsReserved(cacheKey))
             {
                 yield return new WaitForSeconds(0.1f);
@@ -87,19 +93,27 @@ public class ImageAI : MonoBehaviour
             {
                 string result = www.downloadHandler.text;
 
-                var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
-                string base64Image = jsonData.SelectToken("images[0]").ToString();
-                if (!string.IsNullOrEmpty(base64Image))
+                try
                 {
-                    byte[] data = System.Convert.FromBase64String(base64Image);
-                    www.Dispose();
-                    if (useCache) { cache.SetData(cacheKey, data, createKeyFoldersIfNeeded: true); }
-                    callback?.Invoke(ImageAIHelper.GetTextureFromData(data));
+                    var jsonData = JsonConvert.DeserializeObject(result) as Newtonsoft.Json.Linq.JObject;
+                    string base64Image = jsonData.SelectToken("images[0]").ToString();
+                    if (!string.IsNullOrEmpty(base64Image))
+                    {
+                        byte[] data = System.Convert.FromBase64String(base64Image);
+                        www.Dispose();
+                        if (useCache) { cache.SetData(cacheKey, data, createKeyFoldersIfNeeded: true); }
+                        callback?.Invoke(ImageAIHelper.GetTextureFromData(data));
+                    }
+                    else
+                    {
+                        www.Dispose();
+                        Debug.LogWarning("Couldn't find image in ImageAI Json");
+                    }
                 }
-                else
+                catch (System.Exception exception)
                 {
                     www.Dispose();
-                    Debug.LogWarning("Couldn't find image in ImageAI Json");
+                    Debug.LogWarning("Couldn't parse ImageAI Json: " + exception.Message + ". Result: " + result);
                 }
                 cache.ReleaseReservation(cacheKey);
                 yield return null;
