@@ -16,7 +16,7 @@ public class ImageAI : MonoBehaviour
 
     public const string cacheFolder = "ImageAI";
 
-    public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] image = null, byte[] mask = null, string cacheKey = null, bool tiling = false, float denoisingStrength = 0.75f)
+    public IEnumerator GetImage(string prompt, System.Action<Texture2D> callback, bool useCache = false, int width = 512, int height = 512, int steps = 50, int promptStrength = 7, int seed = -1, byte[] image = null, byte[] mask = null, string cacheKey = null, bool tiling = false, float denoisingStrength = 0.75f, string negativePrompt = null)
     {
         ImageToImageAIParams aiParams = new ImageToImageAIParams()
         {
@@ -27,6 +27,7 @@ public class ImageAI : MonoBehaviour
             promptStrength = promptStrength,
             steps = steps,
             tiling = tiling,
+            negativePrompt = negativePrompt,
 
             initImages = image != null ? new string[] { ImageAIHelper.ImageBytesToDataString(image) } : null,
             mask = ImageAIHelper.ImageBytesToDataString(mask),
