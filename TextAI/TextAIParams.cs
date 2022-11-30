@@ -16,12 +16,9 @@ public class TextAIParams
     // [insert] placeholder. Currently requires model "text-davinci-002".
     public string suffix = null;
 
-    // At the time of writing, "text-davinci-002" is the "Most capable GPT-3 model. Can do
-    // any task the other models can do, often with less context. In addition to responding
-    // to prompts, also supports inserting completions within text."
-    // Training data goes up to June 2021.
+    // At the time of writing, "davinci-003" is the most capable (and costly) model.
     // https://beta.openai.com/docs/models/overview
-    public const string defaultModel = "text-davinci-002";
+    public const string defaultModel = "text-davinci-003";
     public string model = defaultModel;
 
     // "Controls randomness: Lowering results in less random completions. As the temperature
