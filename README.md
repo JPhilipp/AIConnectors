@@ -28,12 +28,12 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 
 Have a look at UniverseStart.cs to see some examples for GPT-3 and Stable Diffusion live lookups in action.
 
-For instance, this is how to use **GPT-3** in Unity:
+For instance, this is how to use **GPT-4/ ChatGPT** in Unity:
 
     async void TestTextAI()
     {
         textAI = GetComponent<TextAI>();
-        string result = await textAI.GetCompletion("Albert Einstein was");
+        string result = await textAI.GetAnswer("Who was Albert Einstein? Thanks!");
         if (!string.IsNullOrEmpty(result))
         {
             Debug.Log(result);
@@ -44,8 +44,8 @@ You can also await several prompts simultaneously:
 
     async void TestWhenAll()
     {
-        Task<string> a = textAI.GetCompletion("Albert Einstein was");
-        Task<string> b = textAI.GetCompletion("Susan Sarandon is");
+        Task<string> a = textAI.GetAnswer("Who was Albert Einstein?");
+        Task<string> b = textAI.GetAnswer("Who is Susan Sarandon?");
 
         await Task.WhenAll(a, b);
         
