@@ -16,9 +16,16 @@ public class TextAIParams
     // [insert] placeholder. Currently requires model "text-davinci-002".
     public string suffix = null;
 
-    // At the time of writing, "davinci-003" is the most capable (and costly) model.
+    // Endpoints overview:
+    // https://platform.openai.com/docs/models/model-endpoint-compatibility
+    public const string defaultEndpoint = "/v1/chat/completions";
+
+    [JsonIgnore]
+    public string endpoint = defaultEndpoint;
+
+    // Models overview:
     // https://beta.openai.com/docs/models/overview
-    public const string defaultModel = "text-davinci-003";
+    public const string defaultModel = "gpt-4";
     public string model = defaultModel;
 
     // "Controls randomness: Lowering results in less random completions. As the temperature
@@ -89,6 +96,10 @@ public class TextAIParams
     // Use carefully and ensure that you have reasonable settings for max_tokens and stop."
     [JsonProperty("best_of")]
     public int bestOf = 0;
+
+    [JsonProperty("messages")]
+    public List<TextAIMessage> messages = null;
+
 
     public void CapMaxTokensToAllowed()
     {

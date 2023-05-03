@@ -16,7 +16,12 @@ public class TextAI : MonoBehaviour
     const int callCountMaxForSecurity = 150;
     static int callCount = 0;
 
-    public IEnumerator GetCompletion(string prompt, System.Action<string> callback, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel)
+    public IEnumerator GetAnswer(string prompt, System.Action<string> callback, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpoint)
+    {
+        return GetCompletion(prompt, callback, useCache, cacheKey, secondsDelay, maxTokens, stop, temperature, presencePenalty, frequencyPenalty, suffix, showResultInfo, responseLengthMaxGoal, model, endpoint);
+    }
+
+    public IEnumerator GetCompletion(string prompt, System.Action<string> callback, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpoint)
     {
         TextAIParams aiParams = new TextAIParams()
         {
@@ -27,7 +32,8 @@ public class TextAI : MonoBehaviour
             frequencyPenalty = frequencyPenalty,
             stop = stop,
             suffix = suffix,
-            model = model
+            model = model,
+            endpoint = endpoint
         };
 
         if (responseLengthMaxGoal > 0)
@@ -79,10 +85,21 @@ public class TextAI : MonoBehaviour
                     NullValueHandling = NullValueHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore
                 };
+
+                if (aiParams.messages == null && aiParams.endpoint.Contains("chat"))
+                {
+                    aiParams.messages = new List<TextAIMessage>
+                    {
+                        // new TextAIMessage("system", "You are a helpful assistant."),
+                        new TextAIMessage("user", aiParams.prompt)
+                    };
+                    aiParams.prompt = null;
+                }
+
                 string jsonString = JsonConvert.SerializeObject(aiParams, Formatting.None, serializerSettings);
                 // Debug.Log(jsonString);
 
-                string apiUrl = "https://api.openai.com/v1/completions";
+                string apiUrl = "https://api.openai.com" + aiParams.endpoint;
                 UnityWebRequest www = UnityWebRequest.Post(apiUrl, "");
                 www.SetRequestHeader("Content-Type", "application/json");
                 www.SetRequestHeader("Authorization", "Bearer " + key);
@@ -121,22 +138,38 @@ public class TextAI : MonoBehaviour
 
         var jsonData = JsonConvert.DeserializeObject(jsonString) as Newtonsoft.Json.Linq.JObject;
         try
-        {        
-            result = jsonData.SelectToken("choices[0].text").ToString();
-
-            if (showResultInfo)
+        {
+            if (jsonData.SelectToken("choices[0]") == null)
             {
-                Debug.Log("- Finish reason: " + jsonData.SelectToken("choices[0].finish_reason").ToString());
-                int totalTokens = jsonData.SelectToken("usage.total_tokens").ToObject<int>();
+                Debug.LogWarning("GetResultFromJsonString found no result.");
+                Debug.Log(jsonString);
+                return null;
+            }
+            else
+            {
+                if (jsonData.SelectToken("choices[0].message") != null)
+                {
+                    result = jsonData.SelectToken("choices[0].message.content").ToString();
+                }
+                else
+                {
+                    result = jsonData.SelectToken("choices[0].text").ToString();
+                }
 
-                // Price is here and may change: https://openai.com/api/pricing/
-                const float daVinciCostPerThousandInUsd = 0.02f;
-                float usd = daVinciCostPerThousandInUsd * totalTokens * 0.001f;
+                if (showResultInfo)
+                {
+                    Debug.Log("- Finish reason: " + jsonData.SelectToken("choices[0].finish_reason").ToString());
+                    int totalTokens = jsonData.SelectToken("usage.total_tokens").ToObject<int>();
 
-                string info = "- Total tokens used: " + totalTokens + ", " +
-                    "$" + usd;
-                if (cacheWasUsed) { info += " (but $0 as retrieved from cache)"; }
-                Debug.Log(info);
+                    // Price is here and may change: https://openai.com/api/pricing/
+                    const float daVinciCostPerThousandInUsd = 0.02f;
+                    float usd = daVinciCostPerThousandInUsd * totalTokens * 0.001f;
+
+                    string info = "- Total tokens used: " + totalTokens + ", " +
+                        "$" + usd;
+                    if (cacheWasUsed) { info += " (but $0 as retrieved from cache)"; }
+                    Debug.Log(info);
+                }
             }
         }
         catch (System.Exception exception)
