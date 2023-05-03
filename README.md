@@ -13,7 +13,7 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 
 ---
 
-**GPT-3** is a deep learning artificial intelligence which continues a given text prompt. For instance, as you can try for yourself in the [OpenAI playground](https://beta.openai.com/playground), the text "Albert Einstein was" gets completed with "born in Ulm, in the Kingdom of Württemberg in the German Empire, on 14 March 1879. His parents were ..." and more. This project contains a class to connect to the OpenAI API.
+**GPT-4** is a deep learning artificial intelligence which answers text prompts. For instance, as you can try for yourself with [ChatGPT](https://chat.openai.com/), the question "Who was Albert Einstein?" gets answered with "Albert Einstein (1879-1955) was a renowned theoretical physicist and one of the greatest scientific minds in history. He was born in ..." and more. This project contains a class to connect to the OpenAI API.
 
 ---
 
@@ -21,12 +21,12 @@ https://user-images.githubusercontent.com/1754503/198673075-a051cbd3-9a68-4edb-9
 
 * **Json:** Please grab [Newtonsoft Json](https://www.newtonsoft.com/json) to get these to work.
 * **Automatic111 StableDiffusion**: Follow the [install instructions on this repo](https://github.com/AUTOMATIC1111/stable-diffusion-webui), including setting up Python on Windows. Then follow [these instructions to set up the API](https://sphuff.dev/automatic-now-has-an-api).
-* **Key paths:** For GPT-3, put your OpenAI API key into a text file, the path of which you provide via `TextAI.key = "..."`. And if instead of a local StableDiffusion you want to use Replicate.com, add your API key with them into a file you then reference via `ImageAIReplicate.key = "..."`.
+* **Key paths:** For GPT-3/ GPT-4, put your OpenAI API key into a text file, the path of which you provide via `TextAI.key = "..."`. And if instead of a local StableDiffusion you want to use Replicate.com, add your API key with them into a file you then reference via `ImageAIReplicate.key = "..."`.
 * **Cache path:** Change the cache path via `Cache.rootFolder = "..."` to a directory of your choice.
 
 ## How to use
 
-Have a look at UniverseStart.cs to see some examples for GPT-3 and Stable Diffusion live lookups in action.
+Have a look at UniverseStart.cs to see some examples for GPT-4 and Stable Diffusion live lookups in action.
 
 For instance, this is how to use **GPT-4/ ChatGPT** in Unity:
 
