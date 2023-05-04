@@ -15,12 +15,12 @@ public class TextAI : MonoBehaviour
     const int callCountMaxForSecurity = 150;
     static int callCount = 0;
 
-    public Task<string> GetAnswer(string prompt, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpoint)
+    public Task<string> GetAnswer(string prompt, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpointAnswer)
     {
         return GetCompletion(prompt, useCache, cacheKey, secondsDelay, maxTokens, stop, temperature, presencePenalty, frequencyPenalty, suffix, showResultInfo, responseLengthMaxGoal, model, endpoint);
     }
 
-    public Task<string> GetCompletion(string prompt, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpoint)
+    public Task<string> GetCompletion(string prompt, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpointCompletion)
     {
         TextAIParams aiParams = new TextAIParams()
         {
@@ -91,7 +91,7 @@ public class TextAI : MonoBehaviour
                 }
 
                 string jsonString = JsonConvert.SerializeObject(aiParams, Formatting.None, serializerSettings);
-                // Debug.Log(jsonString);
+                Debug.Log(jsonString);
 
                 string apiUrl = "https://api.openai.com" + aiParams.endpoint;
                 UnityWebRequest www = UnityWebRequest.Post(apiUrl, "");

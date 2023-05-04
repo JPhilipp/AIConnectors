@@ -25,10 +25,11 @@ namespace Universe
         Cache.rootFolder = pathPrefix + "Cache";
 
         string openAIKey = File.ReadAllText(pathPrefix + "openai-key.txt");
-        TextAI.key  = openAIKey;
+        TextAI.key = openAIKey;
         CoroutineVariant.TextAI.key = openAIKey;
         ImageAIDallE.key = openAIKey;
 
+        ImageAIStability.key = File.ReadAllText(pathPrefix + "stability-key.txt");
         ImageAIReplicate.key = File.ReadAllText(pathPrefix + "replicate-key.txt");
 
         textAI = Misc.GetAddComponent<TextAI>(gameObject);
@@ -37,17 +38,33 @@ namespace Universe
     void Start()
     {
         // TestTextAI();
+        // TestTextAI_GPT3();
+        // TestTextAI_Coroutine();
         // TestImageAI();
+        // TestImageAIStability();
         // StartCoroutine(TestWhenAll_Coroutine());
     }
 
     async void TestTextAI()
     {
+        const string prompt = "Who was Albert Einstein? Thanks!";
+        
+        System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        string result = await textAI.GetAnswer(prompt, useCache: false, temperature: 0f, showResultInfo: false, maxTokens: 200);
+        stopwatch.Stop();
+        Debug.Log($"TestTextAI elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+        Debug.Log(result);
+    }
+
+    async void TestTextAI_GPT3()
+    {
         const string prompt = "Albert Einstein was";
         
         System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        string result = await textAI.GetCompletion(prompt, useCache: false, temperature: 0f, showResultInfo: false, maxTokens: 200);
+        string result = await textAI.GetAnswer(prompt, useCache: false, temperature: 0f, showResultInfo: false, maxTokens: 200,
+            model: "text-davinci-003", endpoint: "/v1/completions");
         stopwatch.Stop();
         Debug.Log($"TestTextAI elapsed time: {stopwatch.ElapsedMilliseconds} ms");
         Debug.Log(result);
@@ -56,12 +73,12 @@ namespace Universe
     void TestTextAI_Coroutine()
     {
         CoroutineVariant.TextAI textAICoroutine = Misc.GetAddComponent<CoroutineVariant.TextAI>(gameObject);
-        const string prompt = "Albert Einstein was";
+        const string prompt = "Who was Albert Einstein? Thanks!";
 
         System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
         StartCoroutine(
-            textAICoroutine.GetCompletion(prompt, (string result) =>
+            textAICoroutine.GetAnswer(prompt, (string result) =>
             {
                 stopwatch.Stop();
                 Debug.Log($"TestTextAI elapsed time: {stopwatch.ElapsedMilliseconds} ms");
@@ -75,8 +92,8 @@ namespace Universe
     {
         Debug.Log("TestWhenAll");
 
-        Task<string> a = textAI.GetCompletion("Albert Einstein was", useCache: false);
-        Task<string> b = textAI.GetCompletion("Susan Sarandon is",   useCache: false);
+        Task<string> a = textAI.GetAnswer("Who was Albert Einstein?", useCache: false);
+        Task<string> b = textAI.GetAnswer("Who is Susan Sarandon?",   useCache: false);
         
         await Task.WhenAll(a, b);
         
@@ -91,8 +108,8 @@ namespace Universe
 
         string a = null;
         string b = null;
-        StartCoroutine(textAICoroutine.GetCompletion("Albert Einstein was", (result) => a = result));
-        StartCoroutine(textAICoroutine.GetCompletion("Susan Sarandon is",   (result) => b = result));
+        StartCoroutine(textAICoroutine.GetAnswer("Who was Albert Einstein?", (result) => a = result));
+        StartCoroutine(textAICoroutine.GetAnswer("Who is Susan Sarandon?",   (result) => b = result));
         yield return new WaitUntil(()=>
         {
             return !string.IsNullOrEmpty(a) && !string.IsNullOrEmpty(b);
@@ -117,7 +134,28 @@ namespace Universe
                 renderer.material.mainTexture = texture;
             },
             useCache: false,
-            width: 256, height: 256
+            width: 512, height: 512
+        ));
+    }
+
+    void TestImageAIStability()
+    {
+        ImageAIStability imageAI = Misc.GetAddComponent<ImageAIStability>(gameObject);
+
+        // StartCoroutine(imageAI.ShowAvailableEngines());
+
+        string prompt = "person on mountain, minimalist 3d";
+        Debug.Log("Sending prompt " + prompt);
+
+        StartCoroutine(
+            imageAI.GetImage(prompt, (Texture2D texture) =>
+            {
+                Debug.Log("Done.");
+                Renderer renderer = testCube.GetComponent<Renderer>();
+                renderer.material.mainTexture = texture;
+            },
+            useCache: false,
+            width: 512, height: 512
         ));
     }
 

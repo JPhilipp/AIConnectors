@@ -16,12 +16,12 @@ public class TextAI : MonoBehaviour
     const int callCountMaxForSecurity = 150;
     static int callCount = 0;
 
-    public IEnumerator GetAnswer(string prompt, System.Action<string> callback, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpoint)
+    public IEnumerator GetAnswer(string prompt, System.Action<string> callback, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpointAnswer)
     {
         return GetCompletion(prompt, callback, useCache, cacheKey, secondsDelay, maxTokens, stop, temperature, presencePenalty, frequencyPenalty, suffix, showResultInfo, responseLengthMaxGoal, model, endpoint);
     }
 
-    public IEnumerator GetCompletion(string prompt, System.Action<string> callback, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpoint)
+    public IEnumerator GetCompletion(string prompt, System.Action<string> callback, bool useCache = false, string cacheKey = null, float secondsDelay = 0f, int maxTokens = 100, string[] stop = null, float temperature = 0.7f, float presencePenalty = 0f, float frequencyPenalty = 0f, string suffix = null, bool showResultInfo = false, int responseLengthMaxGoal = 0, string model = TextAIParams.defaultModel, string endpoint = TextAIParams.defaultEndpointCompletion)
     {
         TextAIParams aiParams = new TextAIParams()
         {

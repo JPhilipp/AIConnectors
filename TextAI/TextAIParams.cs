@@ -18,10 +18,11 @@ public class TextAIParams
 
     // Endpoints overview:
     // https://platform.openai.com/docs/models/model-endpoint-compatibility
-    public const string defaultEndpoint = "/v1/chat/completions";
+    public const string defaultEndpointAnswer = "/v1/chat/completions";
+    public const string defaultEndpointCompletion = "/v1/completions";
 
     [JsonIgnore]
-    public string endpoint = defaultEndpoint;
+    public string endpoint = defaultEndpointAnswer;
 
     // Models overview:
     // https://beta.openai.com/docs/models/overview

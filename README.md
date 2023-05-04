@@ -1,5 +1,5 @@
 # AIConnectors
- **Here you'll find Unity C# connections to StableDiffusion, GPT-3, GPT-4/ ChatGPT, Dall-E 2, and possibly other AI tools in the future.**
+ **Here you'll find Unity C# connections to StableDiffusion, GPT-3, GPT-4/ ChatGPT, Stability.ai SDXL/ Dreamstudio API, Dall-E 2, and possibly other AI tools in the future.**
 
 🡆 To see these in action, check out the [AI TV channel on YouTube](https://www.youtube.com/playlist?list=PL9LD6IUjh-8iQZ-cvfTYwnuzEDECCqrRr).
 
