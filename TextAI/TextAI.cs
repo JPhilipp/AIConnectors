@@ -155,15 +155,21 @@ public class TextAI : MonoBehaviour
                 if (showResultInfo)
                 {
                     Debug.Log("- Finish reason: " + jsonData.SelectToken("choices[0].finish_reason").ToString());
-                    int totalTokens = jsonData.SelectToken("usage.total_tokens").ToObject<int>();
+                    int promptTokens     = jsonData.SelectToken("usage.prompt_tokens").    ToObject<int>();
+                    int completionTokens = jsonData.SelectToken("usage.completion_tokens").ToObject<int>();
 
                     // Price is here and may change: https://openai.com/api/pricing/
-                    const float daVinciCostPerThousandInUsd = 0.02f;
-                    float usd = daVinciCostPerThousandInUsd * totalTokens * 0.001f;
+                    // Below only reflects the GPT-4/ 8k model at the time of writing.
+                    const float promptCostPerThousandInUsd = 0.03f;
+                    const float completionCostPerThousandInUsd = 0.06f;
+                    float usd = (promptTokens     * promptCostPerThousandInUsd +
+                                 completionTokens * completionCostPerThousandInUsd) * 0.001f;
 
-                    string info = "- Total tokens used: " + totalTokens + ", " +
+                    string info = promptTokens + " prompt tokens + " + 
+                        completionTokens + " completion tokens = " +
                         "$" + usd;
                     if (cacheWasUsed) { info += " (but $0 as retrieved from cache)"; }
+                    
                     Debug.Log(info);
                 }
             }
