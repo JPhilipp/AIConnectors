@@ -103,7 +103,7 @@ public class Cache
 
     public static string ToKey(string s, bool allowSlash = false)
     {
-        // s = s.ToLower();
+        string hash = GetHash(s);
 
         s = s.Replace(" ", "_");
 
@@ -121,9 +121,22 @@ public class Cache
         s = Misc.RemoveFromStart(s, "_");
         s = Misc.RemoveFromEnd(s, "_");
 
-        s = Misc.Truncate(s, 150, addDots: false);
+        s = Misc.Truncate(s, 60, addDots: false) + "_" + hash;
 
         return s;
+    }
+
+    static string GetHash(string s)
+    {
+        string hash = "";
+        if (!string.IsNullOrEmpty(s))
+        {
+            System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create();
+            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(s);
+            byte[] hashBytes = md5.ComputeHash(inputBytes);
+            hash = System.BitConverter.ToString(hashBytes).Replace("-", "");
+        }
+        return hash;
     }
 
     string ToValidExtension(string extensionToCheck)
